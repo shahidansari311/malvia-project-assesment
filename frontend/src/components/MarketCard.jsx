@@ -9,17 +9,22 @@ const MarketCard = ({ market, onSelect }) => {
   useEffect(() => {
     const calculateTime = () => {
       const now = new Date();
-      const currentTime = now.toTimeString().split(' ')[0];
+      const currentTime = now.toLocaleTimeString('en-GB', { hour12: false });
       
-      market.open_time.split(':');
-      const [closeH, closeM] = market.close_time.split(':');
-      
+      const { open_time: open, close_time: close } = market;
+      let isOpenMatch = false;
+      if (open <= close) {
+        isOpenMatch = currentTime >= open && currentTime <= close;
+      } else {
+        isOpenMatch = currentTime >= open || currentTime <= close;
+      }
+
+      const [closeH, closeM] = close.split(':');
       const closeDate = new Date();
       closeDate.setHours(closeH, closeM, 0);
-
       const diff = closeDate - now;
-      
-      if (currentTime >= market.open_time && currentTime <= market.close_time) {
+
+      if (isOpenMatch) {
         setIsOpen(true);
         if (diff > 0) {
           const hours = Math.floor(diff / (1000 * 60 * 60));

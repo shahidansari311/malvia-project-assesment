@@ -10,12 +10,26 @@ const getMarkets = async (req, res) => {
 
     if (error) throw error;
 
-    // Add dynamic status based on current time
+    // Add dynamic status based on current time in Indian Standard Time (IST)
     const now = new Date();
-    const currentTime = now.toTimeString().split(" ")[0]; // HH:MM:SS
+    // Using en-GB to get HH:MM:SS format without AM/PM
+    const currentTime = now.toLocaleTimeString("en-GB", {
+      timeZone: "Asia/Kolkata",
+      hour12: false,
+    });
 
     const processedMarkets = markets.map((m) => {
-      const isOpen = currentTime >= m.open_time && currentTime <= m.close_time;
+      const { open_time: open, close_time: close } = m;
+      let isOpen = false;
+
+      if (open <= close) {
+        // Standard case: 09:00 to 12:00
+        isOpen = currentTime >= open && currentTime <= close;
+      } else {
+        // Overnight case: 22:00 to 02:00
+        isOpen = currentTime >= open || currentTime <= close;
+      }
+
       return { ...m, status: isOpen ? "open" : "closed" };
     });
 

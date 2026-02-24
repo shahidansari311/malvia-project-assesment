@@ -13,8 +13,15 @@ import { useNavigate } from 'react-router-dom';
 function useCountdown(openTime, closeTime) {
   const compute = useCallback(() => {
     const now = new Date();
-    const cur = now.toTimeString().slice(0, 8);
-    const isOpen = cur >= openTime && cur <= closeTime;
+    // Using en-GB to get HH:MM:SS format
+    const cur = now.toLocaleTimeString('en-GB', { hour12: false });
+    
+    let isOpen = false;
+    if (openTime <= closeTime) {
+      isOpen = cur >= openTime && cur <= closeTime;
+    } else {
+      isOpen = cur >= openTime || cur <= closeTime;
+    }
 
     if (isOpen) {
       const [ch, cm] = closeTime.split(':');

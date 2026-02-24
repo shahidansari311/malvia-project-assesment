@@ -41,6 +41,7 @@ const AdminDashboard = () => {
     try {
       await updateMarketTimings({ id: m.id, openTime: m.open_time, closeTime: m.close_time });
       toast.success(`✅ ${m.name} updated`);
+      load(true); // Refresh data to update status badges and open count
     } catch {
       toast.error('Update failed');
     }
